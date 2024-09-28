@@ -7,8 +7,6 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import FormikHelperErrorList from "@/app/utils/FormikHelper";
 
-
-
 const validationForm = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().email().required(),
@@ -30,22 +28,24 @@ export default function SignUp() {
   } = useFormik({
     initialValues: { name: "", email: "", password: "" },
     validationSchema: validationForm,
-    onSubmit: (values) => {
-      fetch("/api/users", {
+    onSubmit: async (values, action) => {
+      action.setSubmitting(true);
+      await fetch("/api/users", {
         method: "POST",
-        body:JSON.stringify(values),
-      }).then(async(res) =>{
-        if(res.ok){
+        body: JSON.stringify(values),
+      }).then(async (res) => {
+        if (res.ok) {
           const result = await res.json();
-          console.log(result)
+          console.log(result);
         }
-      })
+        action.setSubmitting(false)
+      });
     },
   });
 
   const { email, name, password } = values;
 
- const formErrors :string[] = FormikHelperErrorList(errors,touched,values)
+  const formErrors: string[] = FormikHelperErrorList(errors, touched, values);
 
   return (
     <AuthFormContainer title="Create New Account" onSubmit={handleSubmit}>
@@ -71,7 +71,7 @@ export default function SignUp() {
         value={password}
         onBlur={handleBlur}
       />
-      <Button type="submit" className="w-full">
+      <Button disabled={isSubmitting} type="submit" className="w-full">
         Sign up
       </Button>
       <div className="">
