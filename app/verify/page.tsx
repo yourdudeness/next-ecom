@@ -1,6 +1,7 @@
 'use client'
 import { notFound, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import { toast } from "react-toastify";
 
 interface Props {
   searchParams: { token: string; userId: string };
@@ -25,15 +26,16 @@ export default function Verify(props: Props) {
         const {error, message} = apiRes as {message: string; error: string};
 
         if(res.ok){
-            console.log(message, 'mess')
-            router.replace('/')
+            toast.success(message);
+            console.log('asdf')
+            router.replace('/');
         }
 
         if(!res.ok && error){
-            console.log(error, 'err')
+            toast.error(error)
         }
     })
-  },[])
+  })
 
   if(!token || !userId) return notFound()
   console.log(props);
